@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import traceback
 
 class Trainer:
-    def __init__(self, model, datasets, save_path, lr=0.001, decay_rate=1e-5):
+    def __init__(self, model, datasets, save_path, lr=0.00002, decay_rate=1e-5):
         self.model = model
         self.datasets = datasets
         self.criterion = nn.CrossEntropyLoss()
@@ -30,7 +30,7 @@ class Trainer:
                 try:
                     self.optimizer.zero_grad()
                     outputs = self.model(images)
-                    # print(f"Output shape: {outputs.shape}, Label shape: {labels.shape}")
+                    print(f"Output shape: {outputs.shape}, Label shape: {labels.shape}")
                     loss = self.criterion(outputs, labels)
                     loss.backward()
                     self.optimizer.step()
@@ -57,8 +57,8 @@ class Trainer:
                 print(traceback.format_exc())
     
     def save_model(self, current_accuracy, epoch, avg_loss):
-        best_model_path = os.path.join(self.save_path,f'art_model_best.pth')
-        model_path = os.path.join(self.save_path,f'art_model_e_{epoch+1}')
+        best_model_path = os.path.join(self.save_path,f'models/art_model_best.pth')
+        model_path = os.path.join(self.save_path,f'models/art_model_e_{epoch+1}')
         if current_accuracy > self.best_val_accuracy:
             self.best_val_accuracy = current_accuracy
             torch.save({
@@ -96,8 +96,7 @@ class Trainer:
         return avg_val_loss, accuracy
     
     def plot_metrics(self):
-        # Plot validation loss
-        save_path = '/Users/victorsandoval/personal/code/val_plot.png'
+        save_path = os.path.join(self.save_path, 'plot.png')
         plt.figure(figsize=(12, 5))
         plt.subplot(1, 2, 1)
         plt.plot(self.val_losses, label='Validation Loss')
@@ -106,7 +105,6 @@ class Trainer:
         plt.ylabel('Loss')
         plt.legend()
 
-        # Plot validation accuracy
         plt.subplot(1, 2, 2)
         plt.plot(self.val_accuracies, label='Validation Accuracy')
         plt.title('Validation Accuracy Over Epochs')
